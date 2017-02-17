@@ -92,6 +92,8 @@ import ca.nrc.cadc.ac.UserNotFoundException;
 import ca.nrc.cadc.ac.client.GMSClient;
 import ca.nrc.cadc.auth.AuthenticationUtil;
 import ca.nrc.cadc.auth.Authorizer;
+import ca.nrc.cadc.reg.Standards;
+import ca.nrc.cadc.reg.client.LocalAuthority;
 import ca.nrc.cadc.auth.DelegationToken;
 import ca.nrc.cadc.auth.SSLUtil;
 import ca.nrc.cadc.auth.X509CertificateChain;
@@ -123,8 +125,7 @@ public class VOSpaceAuthorizer implements Authorizer
 {
     protected static final Logger LOG = Logger.getLogger(VOSpaceAuthorizer.class);
 
-    // TODO: make these configurable or find from the VOSpace capabilities
-    private static final String CRED_SERVICE_ID = "ivo://cadc.nrc.ca/cred";
+    private static String CRED_SERVICE_ID;
 
     public static final String MODE_KEY = VOSpaceAuthorizer.class.getName() + ".state";
     public static final String OFFLINE = "Offline";
@@ -150,6 +151,10 @@ public class VOSpaceAuthorizer implements Authorizer
     {
         initState();
         this.allowPartialPaths = allowPartialPaths;
+
+        LocalAuthority localAuthority = new LocalAuthority();       
+        URI serviceURI = localAuthority.getServiceURI(Standards.CRED_DELEGATE_10.toString());
+        CRED_SERVICE_ID = serviceURI.toString();
     }
 
     // this method will only downgrade the state to !readable and !writable
